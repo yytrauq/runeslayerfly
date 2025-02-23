@@ -1,0 +1,107 @@
+# **Free Open-Source FLY Script working for solara** 
+
+-- variables for the animations
+local Player = game.Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local RootPart = Character:WaitForChild("HumanoidRootPart")
+
+-- Animations loading
+local WalkAnim = Instance.new("Animation")
+WalkAnim.AnimationId = "rbxassetid://11666515506"
+
+local RunAnim = Instance.new("Animation")
+RunAnim.AnimationId = "rbxassetid://11666512870"
+
+local JumpAnim = Instance.new("Animation")
+JumpAnim.AnimationId = "rbxassetid://10345160772"
+
+local FallAnim = Instance.new("Animation")
+FallAnim.AnimationId = "rbxassetid://10621207244"
+
+local FlyAnim1 = Instance.new("Animation")
+FlyAnim1.AnimationId = "rbxassetid://180435571"
+
+local FlyAnim2 = Instance.new("Animation")
+FlyAnim2.AnimationId = "rbxassetid://180435792"
+
+-- Animation-Tracks creating
+local WalkTrack = Humanoid:LoadAnimation(WalkAnim)
+local RunTrack = Humanoid:LoadAnimation(RunAnim)
+local JumpTrack = Humanoid:LoadAnimation(JumpAnim)
+local FallTrack = Humanoid:LoadAnimation(FallAnim)
+local FlyTrack1 = Humanoid:LoadAnimation(FlyAnim1)
+local FlyTrack2 = Humanoid:LoadAnimation(FlyAnim2)
+
+-- Fly-Logic
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local isFlying = false
+local flySpeed = 50
+
+-- functions to start flying
+local function StartFlying()
+    isFlying = true
+    Humanoid:ChangeState(Enum.HumanoidStateType.Freefall) -- set humanoid into freefall state
+    FlyTrack1:Play()
+    FlyTrack2:Play()
+end
+
+-- Functions to stop flying
+local function StopFlying()
+    isFlying = false
+    FlyTrack1:Stop()
+    FlyTrack2:Stop()
+    Humanoid:ChangeState(Enum.HumanoidStateType.Landed) -- reset humanoid back to "landed"
+end
+
+-- Eingabeerkennung
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end -- ignore inputs if game already resolved
+
+    if input.KeyCode == Enum.KeyCode.Space then -- Space to start/stop flying
+        if isFlying then
+            StopFlying()
+        else
+            StartFlying()
+        end
+    end
+end)
+
+-- fly movement
+RunService.RenderStepped:Connect(function()
+    if isFlying then
+        local direction = Vector3.new(0, 0, 0)
+
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then -- Vorwärts
+            direction = direction + RootPart.CFrame.LookVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then -- Rückwärts
+            direction = direction - RootPart.CFrame.LookVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then -- Links
+            direction = direction - RootPart.CFrame.RightVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then -- Rechts
+            direction = direction + RootPart.CFrame.RightVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then -- Hoch
+            direction = direction + Vector3.new(0, 1, 0)
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then -- Runter
+            direction = direction - Vector3.new(0, 1, 0)
+        end
+
+        direction = direction.Unit * flySpeed
+        RootPart.Velocity = direction
+    end
+end)
+
+-- Anti-Cheat-Security
+-- Deactivating useless humanoid stuff to bypass anticheat
+Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+
+-- hint for the user
+print("Fly-Script injected! Press Space, to fly /made by @quartyy461 :D.")
