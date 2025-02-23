@@ -1,12 +1,10 @@
-# **Free Open-Source FLY Script working for solara** 
-
--- variables for the animations
+ -- Variablen für die Animationen
 local Player = game.Players.LocalPlayer
 local Character = Player.Character or Player.CharacterAdded:Wait()
 local Humanoid = Character:WaitForChild("Humanoid")
 local RootPart = Character:WaitForChild("HumanoidRootPart")
 
--- Animations loading
+-- Animationen laden
 local WalkAnim = Instance.new("Animation")
 WalkAnim.AnimationId = "rbxassetid://11666515506"
 
@@ -25,7 +23,7 @@ FlyAnim1.AnimationId = "rbxassetid://180435571"
 local FlyAnim2 = Instance.new("Animation")
 FlyAnim2.AnimationId = "rbxassetid://180435792"
 
--- Animation-Tracks creating
+-- Animation-Tracks erstellen
 local WalkTrack = Humanoid:LoadAnimation(WalkAnim)
 local RunTrack = Humanoid:LoadAnimation(RunAnim)
 local JumpTrack = Humanoid:LoadAnimation(JumpAnim)
@@ -33,34 +31,34 @@ local FallTrack = Humanoid:LoadAnimation(FallAnim)
 local FlyTrack1 = Humanoid:LoadAnimation(FlyAnim1)
 local FlyTrack2 = Humanoid:LoadAnimation(FlyAnim2)
 
--- Fly-Logic
+-- Fly-Logik
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 local isFlying = false
 local flySpeed = 50
 
--- functions to start flying
+-- Funktion zum Starten des Fliegens
 local function StartFlying()
     isFlying = true
-    Humanoid:ChangeState(Enum.HumanoidStateType.Freefall) -- set humanoid into freefall state
+    Humanoid:ChangeState(Enum.HumanoidStateType.Freefall) -- Setze den Humanoid in den Freefall-Zustand
     FlyTrack1:Play()
     FlyTrack2:Play()
 end
 
--- Functions to stop flying
+-- Funktion zum Stoppen des Fliegens
 local function StopFlying()
     isFlying = false
     FlyTrack1:Stop()
     FlyTrack2:Stop()
-    Humanoid:ChangeState(Enum.HumanoidStateType.Landed) -- reset humanoid back to "landed"
+    Humanoid:ChangeState(Enum.HumanoidStateType.Landed) -- Setze den Humanoid zurück in den Landed-Zustand
 end
 
 -- Eingabeerkennung
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end -- ignore inputs if game already resolved
+    if gameProcessed then return end -- Ignoriere Eingaben, wenn das Spiel sie bereits verarbeitet hat
 
-    if input.KeyCode == Enum.KeyCode.Space then -- Space to start/stop flying
+    if input.KeyCode == Enum.KeyCode.Space then -- Leertaste zum Starten/Stoppen des Fliegens
         if isFlying then
             StopFlying()
         else
@@ -69,7 +67,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     end
 end)
 
--- fly movement
+-- Flugbewegung
 RunService.RenderStepped:Connect(function()
     if isFlying then
         local direction = Vector3.new(0, 0, 0)
@@ -98,10 +96,10 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Anti-Cheat-Security
--- Deactivating useless humanoid stuff to bypass anticheat
+-- Anti-Cheat-Sicherheit
+-- Deaktiviere unnötige Humanoid-Eigenschaften, um Anti-Cheat zu umgehen
 Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
 Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
 
--- hint for the user
-print("Fly-Script injected! Press Space, to fly /made by @quartyy461 :D.")
+-- Hinweis für den Benutzer
+print("Fly-Script geladen! Drücke Leertaste, um zu fliegen.")
